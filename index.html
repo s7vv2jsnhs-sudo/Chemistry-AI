@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>化学课粗盐提纯答题系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background-color: #f0f7ff;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 100, 200, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e88e5 0%, #0d47a1 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        h1 i {
+            font-size: 2.2rem;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .mode-selector {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .mode-btn {
+            padding: 12px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mode-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .mode-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #0d47a1;
+            border-color: white;
+        }
+
+        .content {
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        /* 教师界面样式 */
+        .teacher-interface, .student-interface {
+            display: none;
+        }
+
+        .interface.active {
+            display: block;
+        }
+
+        h2 {
+            color: #0d47a1;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e3f2fd;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: #1e88e5;
+        }
+
+        .panel {
+            background: #f8fbff;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid #1e88e5;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            color: #1565c0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        input[type="text"], textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #d1e3ff;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #1e88e5;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .question-number-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .question-number-selector label {
+            margin-bottom: 0;
+        }
+
+        .question-number-selector select {
+            width: auto;
+            min-width: 80px;
+        }
+
+        .questions-container {
+            display: none;
+        }
+
+        .question-block {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #e3f2fd;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e3f2fd;
+        }
+
+        .question-index {
+            font-weight: bold;
+            color: #1e88e5;
+            font-size: 1.2rem;
+        }
+
+        .options-container {
+            margin-top: 15px;
+        }
+
+        .option-input {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .option-label {
+            width: 40px;
+            font-weight: bold;
+            color: #1e88e5;
+        }
+
+        .correct-option {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .correct-option select {
+            width: auto;
+            margin-left: 10px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(to right, #1e88e5, #0d47a1);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 2px solid #bbdefb;
+        }
+
+        .btn-success {
+            background: linear-gradient(to right, #43a047, #2e7d32);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .share-link {
+            background: #e8f4fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .link-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .link-box input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #bbdefb;
+            border-radius: 8px;
+            background: white;
+            font-size: 1rem;
+        }
+
+        .copy-btn {
+            background: #1e88e5;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .copy-btn:hover {
+            background: #1565c0;
+        }
+
+        /* 统计区域 */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .stat-box {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            border-top: 5px solid #1e88e5;
+        }
+
+        .stat-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: #0d47a1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: #f5faff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #1e88e5;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .question-stats {
+            margin-top: 20px;
+        }
+
+        .question-stat-item {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e3f2fd;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .question-stat-header {
+            font-weight: bold;
+            color: #0d47a1;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .chart-container {
+            margin-top: 15px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .chart-label {
+            width: 40px;
+            font-weight: bold;
+            color: #1e88e5;
+        }
+
+        .chart-bar-inner {
+            flex: 1;
+            height: 40px;
+            background: #e3f2fd;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, #64b5f6, #1e88e5);
+            border-radius: 5px;
+            transition: width 1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* 学生界面样式 */
+        .student-quiz-container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            border-left: 5px solid #43a047;
+        }
+
+        .quiz-progress {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e3f2fd;
+        }
+
+        .progress-text {
+            font-weight: 600;
+            color: #0d47a1;
+            font-size: 1.1rem;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e3f2fd;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(to right, #1e88e5, #0d47a1);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .question-text {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background: #f8fbff;
+            border: 2px solid #d1e3ff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-item:hover {
+            background: #e8f4fd;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .option-item.selected {
+            background: #e3f2fd;
+            border-color: #1e88e5;
+            box-shadow: 0 5px 10px rgba(30, 136, 229, 0.2);
+        }
+
+        .option-letter {
+            width: 40px;
+            height: 40px;
+            background: #1e88e5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .option-text {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .student-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .result-summary {
+            margin-top: 30px;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: none;
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 2px solid #c8e6c9;
+        }
+
+        .result-stats {
+            margin-top: 30px;
+            background: #f8fbff;
+            border-radius: 10px;
+            padding: 25px;
+            display: none;
+        }
+
+        .result-stats h3 {
+            color: #0d47a1;
+            margin-bottom: 20px;
+        }
+
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .stats-table th, .stats-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e3f2fd;
+        }
+
+        .stats-table th {
+            background: #e3f2fd;
+            color: #0d47a1;
+            font-weight: 600;
+        }
+
+        .stats-table tr:hover {
+            background: #f5faff;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .mode-btn {
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .panel {
+                padding: 20px;
+            }
+            
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .question-text {
+                font-size: 1.3rem;
+            }
+            
+            .btn {
+                padding: 12px 20px;
+            }
+            
+            .stats-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+
+        /* 动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* 加载动画 */
+        .loader {
+            display: none;
+            width: 60px;
+            height: 60px;
+            margin: 30px auto;
+            border: 5px solid #e3f2fd;
+            border-radius: 50%;
+            border-top: 5px solid #1e88e5;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            padding: 20px;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-flask"></i> 化学课粗盐提纯答题系统</h1>
+            <p class="subtitle">教师个性化出题 | 学生在线答题 | 实时统计分布</p>
+            
+            <div class="mode-selector">
+                <div class="mode-btn active" id="teacherModeBtn">
+                    <i class="fas fa-chalkboard-teacher"></i> 教师模式
+                </div>
+                <div class="mode-btn" id="studentModeBtn">
+                    <i class="fas fa-user-graduate"></i> 学生模式
+                </div>
+            </div>
+        </header>
+        
+        <div class="content">
+            <!-- 教师界面 -->
+            <div class="teacher-interface active interface">
+                <h2><i class="fas fa-tools"></i> 教师控制面板</h2>
+                
+                <div class="panel">
+                    <div class="panel-title"><i class="fas fa-plus-circle"></i> 创建试卷</div>
+                    
+                    <div class="question-number-selector">
+                        <label for="questionCount">题目数量：</label>
+                        <select id="questionCount">
+                            <option value="1">1题</option>
+                            <option value="2">2题</option>
+                            <option value="3" selected>3题</option>
+                            <option value="4">4题</option>
+                            <option value="5">5题</option>
+                            <option value="6">6题</option>
+                            <option value="7">7题</option>
+                            <option value="8">8题</option>
+                            <option value="9">9题</option>
+                            <option value="10">10题</option>
+                        </select>
+                        <button class="btn btn-secondary" id="generateQuestionsBtn">
+                            <i class="fas fa-magic"></i> 生成题目模板
+                        </button>
+                    </div>
+                    
+                    <div class="questions-container" id="questionsContainer">
+                        <!-- 题目表单将动态生成在这里 -->
+                    </div>
+                    
+                    <div class="buttons">
+                        <button class="btn btn-primary" id="saveQuizBtn">
+                            <i class="fas fa-save"></i> 保存试卷
+                        </button>
+                        <button class="btn btn-success" id="publishQuizBtn">
+                            <i class="fas fa-paper-plane"></i> 发布试卷
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-title"><i class="fas fa-share-alt"></i> 分享答题链接</div>
+                    <div class="share-link">
+                        <p>将以下链接分享给学生，学生即可访问答题页面：</p>
+                        <div class="link-box">
+                            <input type="text" id="shareLink" readonly value="https://gitcode.com/dafadfa23/chem-quiz.git">
+                            <button class="copy-btn" id="copyLinkBtn">
+                                <i class="fas fa-copy"></i> 复制链接
+                            </button>
+                        </div>
+                        <p>或者让学生扫描二维码：</p>
+                        <div id="qrcode" style="width:150px;height:150px;margin:0 auto;background:#f0f0f0;display:flex;align-items:center;justify-content:center;color:#666;font-weight:bold;">
+                            二维码区域
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-title"><i class="fas fa-chart-bar"></i> 答题统计分布</div>
+                    
+                    <div class="loader" id="statsLoader"></div>
+                    
+                    <div class="stats-container" id="statsContainer">
+                        <div class="stat-box">
+                            <div class="stat-title"><i class="fas fa-users"></i> 总体统计</div>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-value" id="totalStudents">0</div>
+                                    <div class="stat-label">参与学生</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="completionRate">0%</div>
+                                    <div class="stat-label">完成率</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="avgCorrectRate">0%</div>
+                                    <div class="stat-label">平均正确率</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value" id="mostCommonAnswer">-</div>
+                                    <div class="stat-label">最多选择答案</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="question-stats" id="questionStats">
+                        <!-- 每道题的统计信息将动态生成在这里 -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 学生界面 -->
+            <div class="student-interface interface">
+                <h2><i class="fas fa-question-circle"></i> 粗盐提纯知识测试</h2>
+                
+                <div class="student-quiz-container fade-in" id="studentQuizContainer">
+                    <div class="quiz-progress">
+                        <div>
+                            <div class="progress-text">题目 <span id="currentQuestionIndex">1</span> / <span id="totalQuestions">3</span></div>
+                            <div class="progress-bar">
+                                <div class="progress-bar-fill" id="progressBarFill" style="width: 33.33%"></div>
+                            </div>
+                        </div>
+                        <div id="timerDisplay" style="font-weight:600;color:#1e88e5;">时间: <span id="timeSpent">0</span>秒</div>
+                    </div>
+                    
+                    <div class="question-text" id="studentQuestionText">粗盐提纯的正确实验步骤顺序是？</div>
+                    
+                    <div class="options-list" id="optionsList">
+                        <!-- 选项将动态生成 -->
+                    </div>
+                    
+                    <div class="student-buttons">
+                        <button class="btn btn-secondary" id="prevQuestionBtn" style="display:none;">
+                            <i class="fas fa-arrow-left"></i> 上一题
+                        </button>
+                        <button class="btn btn-primary" id="nextQuestionBtn">
+                            <i class="fas fa-arrow-right"></i> 下一题
+                        </button>
+                        <button class="btn btn-success" id="submitQuizBtn" style="display:none;">
+                            <i class="fas fa-paper-plane"></i> 提交试卷
+                        </button>
+                    </div>
+                    
+                    <div class="result-summary" id="resultSummary">
+                        <!-- 提交后的结果将显示在这里 -->
+                    </div>
+                    
+                    <div class="result-stats" id="resultStats">
+                        <h3><i class="fas fa-chart-pie"></i> 本题答题分布统计</h3>
+                        <table class="stats-table" id="questionStatsTable">
+                            <thead>
+                                <tr>
+                                    <th>选项</th>
+                                    <th>选择人数</th>
+                                    <th>百分比</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 统计数据将动态生成 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-title"><i class="fas fa-lightbulb"></i> 粗盐提纯知识点</div>
+                    <p>粗盐提纯是初中化学重要实验，目的是除去粗盐中的不溶性杂质（如泥沙）和可溶性杂质（如Ca²⁺、Mg²⁺、SO₄²⁻等）。主要步骤包括：</p>
+                    <ul style="margin-top: 15px; padding-left: 20px;">
+                        <li><strong>溶解</strong>：将粗盐溶于水，使可溶性杂质进入溶液</li>
+                        <li><strong>过滤</strong>：除去不溶性杂质</li>
+                        <li><strong>蒸发</strong>：浓缩溶液，获得食盐晶体</li>
+                        <li><strong>结晶</strong>：进一步提纯得到纯净的氯化钠晶体</li>
+                    </ul>
+                    <p style="margin-top: 15px;">注意：实际操作中可能需要加入化学试剂除去可溶性杂质，但基本实验步骤顺序不变。</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>化学课粗盐提纯答题系统 | 设计用于课堂教学互动 | © 2023 化学教研组</p>
+        </footer>
+    </div>
+
+    <script>
+        // 模式切换功能
+        document.getElementById('teacherModeBtn').addEventListener('click', function() {
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.querySelectorAll('.interface').forEach(interface => interface.classList.remove('active'));
+            document.querySelector('.teacher-interface').classList.add('active');
+        });
+        
+        document.getElementById('studentModeBtn').addEventListener('click', function() {
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            document.querySelectorAll('.interface').forEach(interface => interface.classList.remove('active'));
+            document.querySelector('.student-interface').classList.add('active');
+        });
+        
+        // 全局数据
+        let currentQuiz = {
+            title: "粗盐提纯知识测试",
+            questions: [],
+            isPublished: false,
+            startTime: null,
+            shareId: null
+        };
+        
+        let studentAnswers = []; // 存储每个学生的匿名答题记录
+        let currentStudentAnswers = []; // 当前学生的答案
+        let currentQuestionIndex = 0;
+        let timerInterval = null;
+        let timeSpent = 0;
+        
+        // 粗盐提纯题目库
+        const questionBank = [
+            {
+                text: "粗盐提纯的正确实验步骤顺序是？",
+                options: [
+                    "溶解 → 过滤 → 蒸发 → 结晶",
+                    "溶解 → 蒸发 → 过滤 → 结晶",
+                    "过滤 → 溶解 → 蒸发 → 结晶",
+                    "溶解 → 过滤 → 结晶 → 蒸发"
+                ],
+                correctAnswer: 0
+            },
+            {
+                text: "粗盐提纯实验中，玻璃棒在溶解步骤中的作用是？",
+                options: [
+                    "引流，防止液体外溅",
+                    "搅拌，加速溶解",
+                    "转移固体药品",
+                    "测量液体温度"
+                ],
+                correctAnswer: 1
+            },
+            {
+                text: "过滤操作中，玻璃棒的作用是？",
+                options: [
+                    "搅拌滤液",
+                    "引流，防止液体外溅",
+                    "转移滤渣",
+                    "测量滤液体积"
+                ],
+                correctAnswer: 1
+            },
+            {
+                text: "蒸发结晶时，何时停止加热？",
+                options: [
+                    "水完全蒸发后",
+                    "出现大量晶体时",
+                    "溶液沸腾时",
+                    "有少量晶体出现时"
+                ],
+                correctAnswer: 1
+            },
+            {
+                text: "粗盐提纯实验中，不会用到的仪器是？",
+                options: [
+                    "蒸发皿",
+                    "漏斗",
+                    "烧杯",
+                    "锥形瓶"
+                ],
+                correctAnswer: 3
+            },
+            {
+                text: "粗盐提纯的主要目的是除去什么？",
+                options: [
+                    "氯化钠中的水",
+                    "氯化钠中的不溶性杂质和可溶性杂质",
+                    "氯化钠中的氯离子",
+                    "氯化钠中的钠离子"
+                ],
+                correctAnswer: 1
+            },
+            {
+                text: "过滤操作中，一贴二低三靠中的二低指的是什么？",
+                options: [
+                    "滤纸边缘低于漏斗边缘，漏斗颈紧靠烧杯壁",
+                    "滤纸边缘低于漏斗边缘，液面低于滤纸边缘",
+                    "漏斗尖端紧靠烧杯壁，液面低于滤纸边缘",
+                    "玻璃棒紧靠三层滤纸处，液面低于滤纸边缘"
+                ],
+                correctAnswer: 1
+            },
+            {
+                text: "蒸发操作中，何时停止加热最合适？",
+                options: [
+                    "水完全蒸干时",
+                    "有大量晶体析出时",
+                    "有少量晶体析出时",
+                    "溶液开始沸腾时"
+                ],
+                correctAnswer: 1
+            },
+            {
+                text: "粗盐提纯实验中，下列哪种杂质可以通过过滤除去？",
+                options: [
+                    "氯化镁",
+                    "硫酸钠",
+                    "泥沙",
+                    "氯化钙"
+                ],
+                correctAnswer: 2
+            },
+            {
+                text: "粗盐提纯实验中，蒸发时使用的主要仪器是？",
+                options: [
+                    "烧杯和玻璃棒",
+                    "蒸发皿和玻璃棒",
+                    "漏斗和玻璃棒",
+                    "试管和酒精灯"
+                ],
+                correctAnswer: 1
+            }
+        ];
+        
+        // 生成题目模板
+        document.getElementById('generateQuestionsBtn').addEventListener('click', function() {
+            const questionCount = parseInt(document.getElementById('questionCount').value);
+            generateQuestionForms(questionCount);
+        });
+        
+        // 生成题目表单
+        function generateQuestionForms(count) {
+            const container = document.getElementById('questionsContainer');
+            container.innerHTML = '';
+            container.style.display = 'block';
+            
+            for (let i = 0; i < count; i++) {
+                const questionIndex = i % questionBank.length; // 循环使用题目库
+                const question = questionBank[questionIndex];
+                
+                const questionBlock = document.createElement('div');
+                questionBlock.className = 'question-block fade-in';
+                questionBlock.innerHTML = `
+                    <div class="question-header">
+                        <div class="question-index">第 ${i+1} 题</div>
+                        <button type="button" class="btn btn-secondary btn-sm random-question-btn" data-index="${i}">
+                            <i class="fas fa-random"></i> 随机换题
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label for="questionText${i}">题目内容：</label>
+                        <textarea id="questionText${i}" placeholder="请输入关于粗盐提纯的选择题...">${question.text}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>选项设置：</label>
+                        <div class="options-container">
+                            <div class="option-input">
+                                <span class="option-label">A.</span>
+                                <input type="text" id="optionA${i}" placeholder="选项A" value="${question.options[0]}">
+                            </div>
+                            <div class="option-input">
+                                <span class="option-label">B.</span>
+                                <input type="text" id="optionB${i}" placeholder="选项B" value="${question.options[1]}">
+                            </div>
+                            <div class="option-input">
+                                <span class="option-label">C.</span>
+                                <input type="text" id="optionC${i}" placeholder="选项C" value="${question.options[2]}">
+                            </div>
+                            <div class="option-input">
+                                <span class="option-label">D.</span>
+                                <input type="text" id="optionD${i}" placeholder="选项D" value="${question.options[3]}">
+                            </div>
+                        </div>
+                        
+                        <div class="correct-option">
+                            <label for="correctOption${i}">正确答案：</label>
+                            <select id="correctOption${i}">
+                                <option value="0" ${question.correctAnswer === 0 ? 'selected' : ''}>A</option>
+                                <option value="1" ${question.correctAnswer === 1 ? 'selected' : ''}>B</option>
+                                <option value="2" ${question.correctAnswer === 2 ? 'selected' : ''}>C</option>
+                                <option value="3" ${question.correctAnswer === 3 ? 'selected' : ''}>D</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(questionBlock);
+            }
+            
+            // 添加随机换题按钮事件
+            document.querySelectorAll('.random-question-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    randomizeQuestion(index);
+                });
+            });
+        }
+        
+        // 随机换题
+        function randomizeQuestion(index) {
+            const randomIndex = Math.floor(Math.random() * questionBank.length);
+            const question = questionBank[randomIndex];
+            
+            document.getElementById(`questionText${index}`).value = question.text;
+            document.getElementById(`optionA${index}`).value = question.options[0];
+            document.getElementById(`optionB${index}`).value = question.options[1];
+            document.getElementById(`optionC${index}`).value = question.options[2];
+            document.getElementById(`optionD${index}`).value = question.options[3];
+            document.getElementById(`correctOption${index}`).value = question.correctAnswer;
+        }
+        
+        // 保存试卷
+        document.getElementById('saveQuizBtn').addEventListener('click', function() {
+            const questionCount = parseInt(document.getElementById('questionCount').value);
+            const questions = [];
+            
+            for (let i = 0; i < questionCount; i++) {
+                const questionText = document.getElementById(`questionText${i}`).value;
+                const optionA = document.getElementById(`optionA${i}`).value;
+                const optionB = document.getElementById(`optionB${i}`).value;
+                const optionC = document.getElementById(`optionC${i}`).value;
+                const optionD = document.getElementById(`optionD${i}`).value;
+                const correctOption = parseInt(document.getElementById(`correctOption${i}`).value);
+                
+                if (!questionText || !optionA || !optionB || !optionC || !optionD) {
+                    showAlert("请填写所有题目和选项！", "error");
+                    return;
+                }
+                
+                questions.push({
+                    text: questionText,
+                    options: [optionA, optionB, optionC, optionD],
+                    correctAnswer: correctOption
+                });
+            }
+            
+            currentQuiz.questions = questions;
+            currentQuiz.isPublished = false;
+            
+            showAlert("试卷已保存成功！", "success");
+        });
+        
+        // 发布试卷
+        document.getElementById('publishQuizBtn').addEventListener('click', function() {
+            if (currentQuiz.questions.length === 0) {
+                showAlert("请先保存试卷！", "error");
+                return;
+            }
+            
+            // 在实际应用中，这里会向后端发送请求发布试卷
+            // 这里我们模拟发布过程
+            document.getElementById('statsLoader').style.display = 'block';
+            
+            setTimeout(() => {
+                document.getElementById('statsLoader').style.display = 'none';
+                
+                // 清空之前的答题数据
+                studentAnswers = [];
+                updateStatistics();
+                
+                // 设置发布状态
+                currentQuiz.isPublished = true;
+                currentQuiz.startTime = new Date();
+                currentQuiz.shareId = Math.floor(Math.random() * 100000);
+                
+                // 更新分享链接
+                const shareLink = `https://chemistry-quiz.com/student?id=${currentQuiz.shareId}`;
+                document.getElementById('shareLink').value = shareLink;
+                
+                showAlert("试卷已发布！学生现在可以开始答题。", "success");
+            }, 800);
+        });
+        
+        // 复制链接
+        document.getElementById('copyLinkBtn').addEventListener('click', function() {
+            const shareLink = document.getElementById('shareLink');
+            shareLink.select();
+            shareLink.setSelectionRange(0, 99999); // 移动设备兼容
+            
+            try {
+                document.execCommand('copy');
+                showAlert("链接已复制到剪贴板！", "success");
+            } catch (err) {
+                console.error('复制失败:', err);
+                showAlert("复制失败，请手动选择复制", "error");
+            }
+        });
+        
+        // 更新统计信息
+        function updateStatistics() {
+            const totalStudents = studentAnswers.length;
+            
+            // 计算完成率
+            let completedCount = 0;
+            let totalCorrect = 0;
+            let totalQuestionsAnswered = 0;
+            let mostCommonAnswer = null;
+            let mostCommonCount = 0;
+            
+            // 统计每个选项的总选择次数
+            const optionCounts = {};
+            
+            studentAnswers.forEach(answers => {
+                // 检查是否完成了所有题目
+                if (answers.answers.length === currentQuiz.questions.length) {
+                    completedCount++;
+                    
+                    // 计算该学生的正确率
+                    let correctCount = 0;
+                    answers.answers.forEach((answer, index) => {
+                        totalQuestionsAnswered++;
+                        if (answer === currentQuiz.questions[index].correctAnswer) {
+                            correctCount++;
+                            totalCorrect++;
+                        }
+                        
+                        // 统计选项选择次数
+                        const key = `${index}-${answer}`;
+                        optionCounts[key] = (optionCounts[key] || 0) + 1;
+                        
+                        if (optionCounts[key] > mostCommonCount) {
+                            mostCommonCount = optionCounts[key];
+                            mostCommonAnswer = `第${index+1}题选项${String.fromCharCode(65 + answer)}`;
+                        }
+                    });
+                }
+            });
+            
+            // 计算完成率
+            const completionRate = totalStudents > 0 ? Math.round((completedCount / totalStudents) * 100) : 0;
+            
+            // 计算平均正确率
+            const avgCorrectRate = totalQuestionsAnswered > 0 ? Math.round((totalCorrect / totalQuestionsAnswered) * 100) : 0;
+            
+            // 更新统计显示
+            document.getElementById('totalStudents').textContent = totalStudents;
+            document.getElementById('completionRate').textContent = `${completionRate}%`;
+            document.getElementById('avgCorrectRate').textContent = `${avgCorrectRate}%`;
+            document.getElementById('mostCommonAnswer').textContent = mostCommonAnswer || "-";
+            
+            // 更新每道题的统计
+            updateQuestionStats();
+        }
+        
+        // 更新每道题的统计
+        function updateQuestionStats() {
+            const questionStatsContainer = document.getElementById('questionStats');
+            questionStatsContainer.innerHTML = '';
+            
+            if (currentQuiz.questions.length === 0 || studentAnswers.length === 0) {
+                questionStatsContainer.innerHTML = '<p style="text-align:center;color:#999;padding:20px;">暂无答题数据</p>';
+                return;
+            }
+            
+            // 为每道题创建统计
+            currentQuiz.questions.forEach((question, questionIndex) => {
+                // 统计每个选项的选择次数
+                const optionCounts = [0, 0, 0, 0];
+                let totalAnswers = 0;
+                
+                studentAnswers.forEach(student => {
+                    if (student.answers.length > questionIndex) {
+                        const answer = student.answers[questionIndex];
+                        if (answer >= 0 && answer < 4) {
+                            optionCounts[answer]++;
+                            totalAnswers++;
+                        }
+                    }
+                });
+                
+                const questionStat = document.createElement('div');
+                questionStat.className = 'question-stat-item';
+                
+                // 创建图表
+                let chartHTML = '';
+                optionCounts.forEach((count, index) => {
+                    const percentage = totalAnswers > 0 ? Math.round((count / totalAnswers) * 100) : 0;
+                    chartHTML += `
+                        <div class="chart-bar">
+                            <div class="chart-label">${String.fromCharCode(65 + index)}</div>
+                            <div class="chart-bar-inner">
+                                <div class="chart-bar-fill" style="width: ${percentage}%">
+                                    ${count}人 (${percentage}%)
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                questionStat.innerHTML = `
+                    <div class="question-stat-header">第 ${questionIndex + 1} 题：${question.text.substring(0, 50)}${question.text.length > 50 ? '...' : ''}</div>
+                    <div class="chart-container">
+                        ${chartHTML}
+                    </div>
+                    <div style="margin-top:15px;color:#666;font-size:0.9rem;">
+                        总答题人数: ${totalAnswers} | 正确答案: ${String.fromCharCode(65 + question.correctAnswer)}
+                    </div>
+                `;
+                
+                questionStatsContainer.appendChild(questionStat);
+            });
+        }
+        
+        // 学生端功能
+        function initStudentQuiz() {
+            if (currentQuiz.questions.length === 0) {
+                // 如果没有题目，使用默认题目
+                currentQuiz.questions = [
+                    {
+                        text: "粗盐提纯的正确实验步骤顺序是？",
+                        options: [
+                            "溶解 → 过滤 → 蒸发 → 结晶",
+                            "溶解 → 蒸发 → 过滤 → 结晶",
+                            "过滤 → 溶解 → 蒸发 → 结晶",
+                            "溶解 → 过滤 → 结晶 → 蒸发"
+                        ],
+                        correctAnswer: 0
+                    },
+                    {
+                        text: "粗盐提纯实验中，玻璃棒在溶解步骤中的作用是？",
+                        options: [
+                            "引流，防止液体外溅",
+                            "搅拌，加速溶解",
+                            "转移固体药品",
+                            "测量液体温度"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        text: "过滤操作中，玻璃棒的作用是？",
+                        options: [
+                            "搅拌滤液",
+                            "引流，防止液体外溅",
+                            "转移滤渣",
+                            "测量滤液体积"
+                        ],
+                        correctAnswer: 1
+                    }
+                ];
+            }
+            
+            // 初始化当前学生的答案数组
+            currentStudentAnswers = new Array(currentQuiz.questions.length).fill(-1);
+            
+            // 更新显示
+            document.getElementById('totalQuestions').textContent = currentQuiz.questions.length;
+            
+            // 显示第一题
+            showQuestion(0);
+            
+            // 开始计时
+            startTimer();
+        }
+        
+        // 显示题目
+        function showQuestion(index) {
+            if (index < 0 || index >= currentQuiz.questions.length) return;
+            
+            currentQuestionIndex = index;
+            const question = currentQuiz.questions[index];
+            
+            // 更新进度
+            document.getElementById('currentQuestionIndex').textContent = index + 1;
+            const progressPercent = ((index + 1) / currentQuiz.questions.length) * 100;
+            document.getElementById('progressBarFill').style.width = `${progressPercent}%`;
+            
+            // 更新题目文本
+            document.getElementById('studentQuestionText').textContent = question.text;
+            
+            // 更新选项
+            const optionsList = document.getElementById('optionsList');
+            optionsList.innerHTML = '';
+            
+            question.options.forEach((option, i) => {
+                const optionItem = document.createElement('div');
+                optionItem.className = `option-item ${currentStudentAnswers[index] === i ? 'selected' : ''}`;
+                optionItem.setAttribute('data-option', i);
+                
+                optionItem.innerHTML = `
+                    <div class="option-letter">${String.fromCharCode(65 + i)}</div>
+                    <div class="option-text">${option}</div>
+                `;
+                
+                optionItem.addEventListener('click', function() {
+                    // 移除之前的选择
+                    document.querySelectorAll('.option-item').forEach(opt => opt.classList.remove('selected'));
+                    
+                    // 标记当前选择
+                    this.classList.add('selected');
+                    currentStudentAnswers[index] = parseInt(this.getAttribute('data-option'));
+                    
+                    // 如果已经回答了所有题目，显示提交按钮
+                    if (currentStudentAnswers.every(answer => answer !== -1)) {
+                        document.getElementById('submitQuizBtn').style.display = 'inline-flex';
+                    }
+                });
+                
+                optionsList.appendChild(optionItem);
+            });
+            
+            // 更新按钮显示
+            document.getElementById('prevQuestionBtn').style.display = index > 0 ? 'inline-flex' : 'none';
+            document.getElementById('nextQuestionBtn').style.display = index < currentQuiz.questions.length - 1 ? 'inline-flex' : 'none';
+            document.getElementById('submitQuizBtn').style.display = currentStudentAnswers.every(answer => answer !== -1) ? 'inline-flex' : 'none';
+            
+            // 隐藏结果区域
+            document.getElementById('resultSummary').style.display = 'none';
+            document.getElementById('resultStats').style.display = 'none';
+        }
+        
+        // 上一题
+        document.getElementById('prevQuestionBtn').addEventListener('click', function() {
+            if (currentQuestionIndex > 0) {
+                showQuestion(currentQuestionIndex - 1);
+            }
+        });
+        
+        // 下一题
+        document.getElementById('nextQuestionBtn').addEventListener('click', function() {
+            if (currentQuestionIndex < currentQuiz.questions.length - 1) {
+                showQuestion(currentQuestionIndex + 1);
+            }
+        });
+        
+        // 提交试卷
+        document.getElementById('submitQuizBtn').addEventListener('click', function() {
+            // 检查是否所有题目都已回答
+            if (currentStudentAnswers.includes(-1)) {
+                showAlert("请完成所有题目后再提交！", "error", "student");
+                return;
+            }
+            
+            // 停止计时
+            stopTimer();
+            
+            // 计算正确率
+            let correctCount = 0;
+            currentStudentAnswers.forEach((answer, index) => {
+                if (answer === currentQuiz.questions[index].correctAnswer) {
+                    correctCount++;
+                }
+            });
+            
+            const correctRate = Math.round((correctCount / currentQuiz.questions.length) * 100);
+            
+            // 记录学生答案（匿名）
+            studentAnswers.push({
+                id: studentAnswers.length + 1,
+                answers: [...currentStudentAnswers],
+                timeSpent: timeSpent,
+                submittedAt: new Date().toLocaleString()
+            });
+            
+            // 更新教师端统计
+            updateStatistics();
+            
+            // 显示结果
+            const resultSummary = document.getElementById('resultSummary');
+            resultSummary.innerHTML = `
+                <i class="fas fa-check-circle" style="font-size:2.5rem;margin-bottom:15px;"></i>
+                <p>试卷提交成功！</p>
+                <p>你的成绩：${correctCount}/${currentQuiz.questions.length} (${correctRate}%)</p>
+                <p>用时：${timeSpent}秒</p>
+                <p style="font-size:1rem;margin-top:15px;">以下是本题的答题分布统计（不记名）：</p>
+            `;
+            resultSummary.style.display = 'block';
+            
+            // 显示当前题目的统计
+            showQuestionStats(currentQuestionIndex);
+            
+            // 禁用提交按钮
+            this.disabled = true;
+            
+            // 显示所有题目的统计（实际应用中可能需要等待其他学生提交）
+            setTimeout(() => {
+                showAlert("你的答案已提交！教师端已更新统计。", "success", "student");
+            }, 500);
+        });
+        
+        // 显示题目统计
+        function showQuestionStats(questionIndex) {
+            const question = currentQuiz.questions[questionIndex];
+            const resultStats = document.getElementById('resultStats');
+            const statsTableBody = document.getElementById('questionStatsTable').querySelector('tbody');
+            
+            // 清空表格
+            statsTableBody.innerHTML = '';
+            
+            // 统计当前题目的选项选择情况
+            const optionCounts = [0, 0, 0, 0];
+            let totalAnswers = 0;
+            
+            studentAnswers.forEach(student => {
+                if (student.answers.length > questionIndex) {
+                    const answer = student.answers[questionIndex];
+                    if (answer >= 0 && answer < 4) {
+                        optionCounts[answer]++;
+                        totalAnswers++;
+                    }
+                }
+            });
+            
+            // 添加当前学生的答案（如果已提交）
+            if (currentStudentAnswers[questionIndex] !== -1) {
+                optionCounts[currentStudentAnswers[questionIndex]]++;
+                totalAnswers++;
+            }
+            
+            // 填充表格
+            optionCounts.forEach((count, index) => {
+                const percentage = totalAnswers > 0 ? Math.round((count / totalAnswers) * 100) : 0;
+                const isCorrect = index === question.correctAnswer;
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>
+                        ${String.fromCharCode(65 + index)}. ${question.options[index]}
+                        ${isCorrect ? ' <span style="color:#2e7d32;font-weight:bold;">(正确答案)</span>' : ''}
+                    </td>
+                    <td>${count}人</td>
+                    <td>${percentage}%</td>
+                `;
+                
+                if (isCorrect) {
+                    row.style.backgroundColor = '#f0f9f0';
+                }
+                
+                statsTableBody.appendChild(row);
+            });
+            
+            resultStats.style.display = 'block';
+        }
+        
+        // 计时器功能
+        function startTimer() {
+            timeSpent = 0;
+            document.getElementById('timeSpent').textContent = timeSpent;
+            
+            timerInterval = setInterval(() => {
+                timeSpent++;
+                document.getElementById('timeSpent').textContent = timeSpent;
+            }, 1000);
+        }
+        
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+        
+        // 显示提示消息
+        function showAlert(message, type, mode = "teacher") {
+            const alertDiv = document.createElement('div');
+            alertDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 600;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: fadeIn 0.3s, fadeOut 0.3s 2.7s;
+            `;
+            
+            if (type === "success") {
+                alertDiv.style.backgroundColor = "#43a047";
+            } else if (type === "error") {
+                alertDiv.style.backgroundColor = "#c62828";
+            } else {
+                alertDiv.style.backgroundColor = "#1e88e5";
+            }
+            
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            
+            // 3秒后移除提示
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+        
+        // 页面加载时初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 生成3道题目作为默认
+            generateQuestionForms(3);
+            
+            // 初始化学生端
+            initStudentQuiz();
+            
+            // 模拟其他学生答题（仅演示用）
+            // 在实际使用中，这部分应该由真实学生答题产生
+            /*
+            setInterval(() => {
+                if (currentQuiz.isPublished && Math.random() > 0.8 && studentAnswers.length < 50) {
+                    const randomAnswers = currentQuiz.questions.map(() => Math.floor(Math.random() * 4));
+                    const randomTime = Math.floor(Math.random() * 120) + 30;
+                    
+                    studentAnswers.push({
+                        id: studentAnswers.length + 1,
+                        answers: randomAnswers,
+                        timeSpent: randomTime,
+                        submittedAt: new Date().toLocaleString()
+                    });
+                    
+                    updateStatistics();
+                }
+            }, 5000);
+            */
+        });
+    </script>
+</body>
+</html>
